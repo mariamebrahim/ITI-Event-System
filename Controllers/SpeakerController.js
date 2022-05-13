@@ -1,4 +1,6 @@
 const Speaker=require("./../Models/SpeakerModel");
+const {speakerauthschema}=require("../Helpers/Validation_Schema");
+const createError=require('http-errors');
 
 
 
@@ -62,23 +64,28 @@ module.exports.getAllSpeakerEvents=((request,response,next)=>{
 
 })
 
-//Create a new Speaker
-module.exports.CreateSpeaker=((request,response,next)=>{
+//Create a new Speaker //register speaker
+module.exports.CreateSpeaker=(async(request,response,next)=>{
 
-    let spk=new Speaker({
-        name:request.body.name,
-        email: request.body.email,
-        password:request.body.password,
-        address:request.body.address
-    })
+    try{
+        const result=await speakerauthschema.validateAsync(request.body);  
+        const doesexist=await Speaker.findOne({email:result.email})
+        if (doesexist) 
+            throw createError.Conflict(`${result.email} is already been registered!`);
+        let spk=new Speaker(result);
+        
+            //save new student in database
+            spk.save()
+            .then((data)=>{
+                response.status(201).json({message:"New Speaker Created ",data})
+            })
+            .catch(error=>next(error))
 
-    //save new speaker in database
-    spk.save()
-    .then((data)=>{
-        response.status(201).json({message:"New Speaker Created "+data})
-
-    })
-    .catch(error=>next(error))
+    }catch(error){
+        if(error.isJoi=== true) error.status=422
+        next(error)
+    }
+   
    
 
 })

@@ -1,5 +1,6 @@
 const Student=require("./../Models/StudentModel");
 const createError=require('http-errors');
+const {studauthschema}=require("../Helpers/Validation_Schema");
 
 
 
@@ -15,7 +16,7 @@ module.exports.getAllStudents=((request,response,next)=>{
 
 //Student can update his data
 module.exports.UpdateStudent=((request,response,next)=>{
-    Student.updateOne({_id:request.body.id},{
+    Student.updateOne({email:request.body.email},{
         $set:{
             email:request.body.email,
             password: request.body.password
@@ -32,7 +33,7 @@ module.exports.UpdateStudent=((request,response,next)=>{
 
 //Admin can update Student data
 module.exports.AdminUpdateStudent=((request,response,next)=>{
-    Student.updateOne({_id:request.body.id},{
+    Student.updateOne({email:request.body.email},{
         $set:{
             email:request.body.email,
         },$push:{Events:request.body.Events}
@@ -47,8 +48,6 @@ module.exports.AdminUpdateStudent=((request,response,next)=>{
 
 //Get all Student Events
 module.exports.getAllStdEvents=((request,response,next)=>{
-    // console.log(request.query);
-    // console.log(request.params);
     Student.find({"_id":request.body.id},{"Events":1})
     .then((data)=>{
         response.status(200).json({data})
@@ -62,22 +61,15 @@ module.exports.getAllStdEvents=((request,response,next)=>{
 })
 
 
-//Create a new Student
+//Create a new Student //register student
 module.exports.CreateStudent=(async(request,response,next)=>{
 
     try{
-        const{email,password}=request.body;
-        if(!email || !password) 
-            throw createError.BadRequest();
-        const doesexist=await Student.findOne({email:email})
+        const result=await studauthschema.validateAsync(request.body);  
+        const doesexist=await Student.findOne({email:result.email})
         if (doesexist) 
-            throw createError.Conflict(`${email} is already been registered!`);
-            let std=new Student({
-                _id:request.body.id,
-                email: request.body.email,
-                password:request.body.password
-        
-            })
+            throw createError.Conflict(`${result.email} is already been registered!`);
+        let std=new Student(result);
         
             //save new student in database
             std.save()
@@ -88,6 +80,7 @@ module.exports.CreateStudent=(async(request,response,next)=>{
             .catch(error=>next(error))
 
     }catch(error){
+        if(error.isJoi=== true) error.status=422
         next(error)
     }
    

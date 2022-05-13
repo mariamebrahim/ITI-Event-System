@@ -3,27 +3,21 @@ const { request } = require("express");
 const express=require("express");
 const createError=require('http-errors');
 const student=require("../Models/StudentModel");
-const {authSchema}=require("../Helpers/Validation_Schema");
+const {studauthschema}=require("../Helpers/Validation_Schema");
 
 //const authMW=require("./../Middlewares/Auth.Middleware");
 const router=express.Router();
 const Controller=require("../Controllers/authController");
 const { CreateEvent } = require("../Controllers/EventController");
+const StudentModel = require("../Models/StudentModel");
 
-router.post('/register',async(request,respond,next)=>{
+router.post('/register',async(request,response,next)=>{
     try{
-        const{email,password}=request.body;
-        if(!email || !password) 
-            throw createError.BadRequest();
-        const doesexist=await student.findOne({email:email})
+        const result=await studauthschema.validateAsync(request.body);  
+        const doesexist=await student.findOne({email:result.email})
         if (doesexist) 
-            throw createError.Conflict(`${email} is already been registered!`);
-            let std=new Student({
-                _id:request.body.id,
-                email: request.body.email,
-                password:request.body.password
-        
-            })
+            throw createError.Conflict(`${result.email} is already been registered!`);
+        let std=new student(result);
         
             //save new student in database
             std.save()
@@ -34,9 +28,11 @@ router.post('/register',async(request,respond,next)=>{
             .catch(error=>next(error))
 
     }catch(error){
+        if(error.isJoi=== true) error.status=422
         next(error)
     }
 })
+
 
 router.post('/login',async(request,respond,next)=>{
     respond.send("login route")

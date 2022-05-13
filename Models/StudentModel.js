@@ -3,14 +3,12 @@ const bcrypt=require("bcrypt");
 
 //1-Create Schema
 let Studentschema=new mongoose.Schema({
-    _id:Number,
     email: {type:String,required:true,unique:true},
     password:{type:String,required:true},
     Events:[{ type: Number, ref: 'Event',unique:true}]
 })
 
 //2-Bind this schema(Table design) to specified database
-module.exports=mongoose.model("Student",Studentschema);
 
 Studentschema.pre('save',async function(next){
 
@@ -28,3 +26,5 @@ Studentschema.pre('save',async function(next){
     }
 
 })
+
+module.exports=mongoose.model("Student",Studentschema);

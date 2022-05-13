@@ -1,12 +1,22 @@
 const joi=require('@hapi/joi');
 
 
-const authschema=joi.object({
-    email:joi.string().email().lowercase().required,
+const studauthschema=joi.object({
+    email:joi.string().email().lowercase().required(),
     password:joi.string().min(2).required(),
+
+})
+
+const speakerauthschema=joi.object({
+    name:joi.string().required(),
+    email:joi.string().email().lowercase().required(),
+    password:joi.string().min(2).required(),
+    address:joi.required(),
+    
+
 })
 
 
 module.exports={
-    authschema
+    studauthschema,speakerauthschema
 }
