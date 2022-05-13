@@ -1,0 +1,25 @@
+
+##LoginRoute
+POST http://localhost:8081/auth/login   
+
+##registerRoute
+
+POST http://localhost:8081/auth/register
+
+Content-Type: application/json
+
+{
+    "email":"mariam@gmail.com",
+    "password":"123"
+}
+
+##refresh-tokenRoute
+
+POST http://localhost:8081/auth/refresh-token
+
+##logoutRoute
+
+DELETE http://localhost:8081/auth/logout
+
+
+
