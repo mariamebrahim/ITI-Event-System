@@ -1,6 +1,9 @@
 const Student=require("./../Models/StudentModel");
 const createError=require('http-errors');
 const {studauthschema}=require("../Helpers/Validation_Schema");
+const jwt=require('jsonwebtoken');
+
+const{signAccessToken}=require("../Helpers/jwt_helper");
 
 
 
@@ -72,7 +75,10 @@ module.exports.CreateStudent=(async(request,response,next)=>{
         let std=new Student(result);
         
             //save new student in database
-            std.save()
+            const savedstud= await std.save()
+
+            const accessToken=await signAccessToken(savedstud.id);
+            response.send(accessToken)
             .then((data)=>{
                 response.status(201).json({message:"New Student Created ",data})
                 console.log("student Created");
