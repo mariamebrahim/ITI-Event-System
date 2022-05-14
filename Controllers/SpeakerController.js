@@ -1,6 +1,7 @@
 const Speaker=require("./../Models/SpeakerModel");
 const {speakerauthschema}=require("../Helpers/Validation_Schema");
 const createError=require('http-errors');
+const{signAccessToken}=require("../Helpers/jwt_helper");
 
 
 
@@ -75,7 +76,9 @@ module.exports.CreateSpeaker=(async(request,response,next)=>{
         let spk=new Speaker(result);
         
             //save new student in database
-            spk.save()
+            const savedspk=spk.save();
+            const accessToken=await signAccessToken(savedspk.id);
+            response.send(accessToken)
             .then((data)=>{
                 response.status(201).json({message:"New Speaker Created ",data})
             })
