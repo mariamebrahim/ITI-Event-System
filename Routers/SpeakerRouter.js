@@ -13,6 +13,7 @@ router.route("/speaker")
 .post(Controller.CreateSpeaker)
 .get(Controller.getAllSpeakerEvents)
 .put(Controller.UpdateSpeaker)
+router.post('/speaker/login',Controller.LoginSpeaker)
 
 
 module.exports=router;

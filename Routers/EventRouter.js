@@ -16,5 +16,13 @@ router.route("/event")
 .put(Controller.UpdateEvent)
 .delete(Controller.DeleteEvent)
 
+router.put('/assignspeaker',Controller.AssignSpeakerToEvent)
+router.put('/assignstud',Controller.AssignStudentToEvent)
+router.put('/assignMainspeaker',Controller.AssignMainSpeakerToEvent)
+
+
+router.post('/admin/login',Controller.LoginAdmin)
+
+
 
 module.exports=router;

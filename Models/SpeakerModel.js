@@ -15,7 +15,7 @@ let Speakerschema=new mongoose.Schema({
         street: {type:String,required:true},
         city: {type:String,required:true},
     },
-    Events:[{ type: Number, ref: 'Event' }]
+    Events:[{ type: String, ref: 'Event' }]
 })
 
 Speakerschema.pre('save',async function(next){
@@ -34,6 +34,15 @@ Speakerschema.pre('save',async function(next){
     }
 
 })
+//to compare between password in login and registered password
+Speakerschema.methods.isValidpassword=async function(password){
+    try{
+        return await bcrypt.compare(password,this.password);
+
+    }catch(error){
+        throw error;
+    }
+}
 
 
 //2-Bind this schema(Table design) to specified database

@@ -13,6 +13,7 @@ router.route("/student")
 .post(Controller.CreateStudent)
 .get(Controller.getAllStdEvents)
 .put(Controller.UpdateStudent)
+router.post('/student/login',Controller.LoginStudent)
 
 
 module.exports=router;

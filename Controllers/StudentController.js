@@ -51,8 +51,9 @@ module.exports.AdminUpdateStudent=((request,response,next)=>{
 
 //Get all Student Events
 module.exports.getAllStdEvents=((request,response,next)=>{
-    Student.find({"_id":request.body.id},{"Events":1})
+    Student.find({email:request.body.email}).populate({path:'Events'}) 
     .then((data)=>{
+        console.log(data)
         response.status(200).json({data})
 
     })
@@ -88,6 +89,32 @@ module.exports.CreateStudent=(async(request,response,next)=>{
     }catch(error){
         if(error.isJoi=== true) error.status=422
         next(error)
+    }
+   
+
+})
+
+//student login
+module.exports.LoginStudent=(async(request,response,next)=>{
+
+    try{
+
+        const result=await studauthschema.validateAsync(request.body);
+        const stud=await Student.findOne({email:result.email});
+
+
+        if(!stud) throw createError.NotFound("Student is not Registered!");
+
+        const isMatch=await stud.isValidpassword(result.password);
+        if(!isMatch) throw createError.Unauthorized("UserName or Password is incorrect");
+
+        const accessToken=await signAccessToken(stud.id);
+
+        response.send({accessToken});
+    }catch(error)
+    {
+        if(error.isJoi===true) return next(createError.BadRequest("Invalid UserName or Password"))
+        next(error);
     }
    
 

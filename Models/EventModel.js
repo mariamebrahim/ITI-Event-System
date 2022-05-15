@@ -3,12 +3,11 @@ const Schema = mongoose.Schema;
 
 //1-Create Schema
 let Eventschema=new mongoose.Schema({
-    _id:Number,
     Title: {type:String,required:true},
     EventDate :{type:Date,required:true},
     MainSpeaker:{ type:String, ref: 'Speaker',unique:true},
     Speakers: [{ type:String, ref: 'Speaker' ,unique:true}],
-    Students: [{ type:Number, ref: 'Student',unique:true }],
+    Students: [{ type:String, ref: 'Student',unique:true }],
 })
 
 //2-Bind this schema(Table design) to specified database

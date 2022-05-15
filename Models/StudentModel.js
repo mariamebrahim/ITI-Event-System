@@ -1,6 +1,7 @@
 const mongoose=require("mongoose");
 const bcrypt=require("bcrypt");
 
+
 //1-Create Schema
 let Studentschema=new mongoose.Schema({
     email: {type:String,required:true,unique:true},
@@ -26,5 +27,15 @@ Studentschema.pre('save',async function(next){
     }
 
 })
+
+//to compare between password in login and registered password
+Studentschema.methods.isValidpassword=async function(password){
+    try{
+        return await bcrypt.compare(password,this.password);
+
+    }catch(error){
+        throw error;
+    }
+}
 
 module.exports=mongoose.model("Student",Studentschema);

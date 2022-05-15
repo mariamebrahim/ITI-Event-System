@@ -94,6 +94,33 @@ module.exports.CreateSpeaker=(async(request,response,next)=>{
 })
 
 
+//speaker login
+module.exports.LoginSpeaker=(async(request,response,next)=>{
+
+    try{
+
+       // const result=await speakerauthschema.validateAsync(request.body);
+        const spk=await Speaker.findOne({email:request.body.email});
+
+
+        if(!spk) throw createError.NotFound("Speaker is not Registered!");
+
+        const isMatch=await spk.isValidpassword(request.body.password);
+        if(!isMatch) throw createError.Unauthorized("UserName or Password is incorrect");
+
+        const accessToken=await signAccessToken(spk.id);
+
+        response.send({accessToken});
+    }catch(error)
+    {
+        //if(error.isJoi===true) return next(createError.BadRequest("Invalid UserName or Password"))
+        next(error);
+    }
+   
+
+})
+
+
 //Delete Speaker
 module.exports.DeleteSpeaker=((request,response,error)=>{
     Speaker.deleteOne({email:request.body.email})

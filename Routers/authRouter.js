@@ -10,6 +10,7 @@ const router=express.Router();
 const Controller=require("../Controllers/authController");
 const { CreateEvent } = require("../Controllers/EventController");
 const StudentModel = require("../Models/StudentModel");
+const { signAccessToken } = require("../Controllers/authController");
 
 router.post('/register',async(request,response,next)=>{
     try{
@@ -34,8 +35,26 @@ router.post('/register',async(request,response,next)=>{
 })
 
 
-router.post('/login',async(request,respond,next)=>{
-    respond.send("login route")
+router.post('/login',async(request,response,next)=>{
+    try{
+
+        const result=await studauthschema.validateAsync(request.body);
+        const stud=await student.findOne({email:result.email});
+
+
+        if(!stud) throw createError.NotFound("Student is not Registered!");
+
+        const isMatch=await stud.isValidpassword(result.password);
+        if(!isMatch) throw createError.Unauthorized("UserName or Password is incorrect");
+
+        const accessToken=await signAccessToken(stud.id);
+
+        response.send({accessToken});
+    }catch(error)
+    {
+        if(error.isJoi===true) return next(createError.BadRequest("Invalid UserName or Password"))
+        next(error);
+    }
 })
 
 router.post('/refresh-token',async(request,respond,next)=>{
